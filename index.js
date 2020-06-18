@@ -1,6 +1,6 @@
 const express = require('express')
 
-const barberSchedulerRouter = require('./routes/barberScheduler');
+const barberSchedulerRouter = require('./routes/barberScheduler/barberScheduler');
 
 const app = express()
 const port = process.env.PORT || 1337;

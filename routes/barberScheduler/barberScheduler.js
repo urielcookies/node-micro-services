@@ -1,8 +1,15 @@
-var express = require('express');
-var router = express.Router();
+const express = require('express');
 const jwt = require('jsonwebtoken');
+const mysql = require('mysql');
 
-// /
+const mysqlConnection = require('./utils/handleDisconnect');
+
+const router = express.Router();
+
+// Create connection 
+mysqlConnection();
+
+// root
 router.get(`/`, (req, res, next) => {
   res.send('Barber Scheduler Routes');
 });
