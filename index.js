@@ -6,6 +6,8 @@ const app = express()
 const port = process.env.PORT || 1337;
 
 app.get('/', (req, res) => res.send('Hello World!'))
+
+app.use(express.json());
 app.use('/barber-scheduler', barberSchedulerRouter);
 
 // error handler

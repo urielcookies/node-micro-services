@@ -1,4 +1,5 @@
 const express = require('express');
+const passwordHash = require('password-hash');
 const jwt = require('jsonwebtoken');
 const mysql = require('mysql');
 
@@ -49,7 +50,7 @@ router.get(`/`, (req, res, next) => {
 
 // /barber-scheduler/getboss
 router.get('/getboss', verifyToken, (req, res, next) => {
-  jwt.verify(req.token, 'secretKey???', (err, authData) => {
+  jwt.verify(req.token, '621', (err, authData) => {
     if (err) res.sendStatus(403);
      else {
        const sql = 'SELECT * FROM `hzmnrnmy_barber-scheduler`.users WHERE id = 1;';
@@ -67,7 +68,7 @@ router.get('/getboss', verifyToken, (req, res, next) => {
 
 // /barber-scheduler/secret
 router.get('/secret', verifyToken, (req, res, next) => {
-  jwt.verify(req.token, 'secretKey???', (err, authData) => {
+  jwt.verify(req.token, '621', (err, authData) => {
     if (err) res.sendStatus(403);
      else {
       res.json({
@@ -79,11 +80,19 @@ router.get('/secret', verifyToken, (req, res, next) => {
 
 // /barber-scheduler/login
 router.post('/login', (req, res, next) => {
-  // Mock User 
+  const {email, password} = req.body;
 
-  jwt.sign({email:'urielcookies@outlook.com'}, "secretKey???", {
-    expiresIn: '365d' // expires in 365 days
-  }, (err, token) => res.json({token}));
+  const sql = 'SELECT * FROM `hzmnrnmy_barber-scheduler`.users WHERE email = "'+email+'";';
+  db.query(sql, (err, result) => {
+    if (err) throw err;
+    const allowUser = passwordHash.verify(password, result[0].Password);
+    if (!allowUser) return res.sendStatus(403);
+    delete result[0].Password;
+
+    jwt.sign({email: result[0].Email}, "621", {
+      expiresIn: '365d' // expires in 365 days
+    }, (err, token) => res.json({token, result: result[0]}));
+  })
 });
 
 function verifyToken (req, res, next) {
