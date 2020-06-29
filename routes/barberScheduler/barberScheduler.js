@@ -86,12 +86,15 @@ router.post('/login', (req, res, next) => {
   db.query(sql, (err, result) => {
     if (err) throw err;
     const allowUser = passwordHash.verify(password, result[0].Password);
-    if (!allowUser) return res.sendStatus(403);
+    if (!allowUser) return res.sendStatus(401); // unauthorized
     delete result[0].Password;
 
     jwt.sign({email: result[0].Email}, "621", {
       expiresIn: '365d' // expires in 365 days
-    }, (err, token) => res.json({token, result: result[0]}));
+    }, (err, token) => {
+      res.cookie(token, token);
+      res.json(result[0])
+    })
   })
 });
 
